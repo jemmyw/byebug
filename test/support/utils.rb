@@ -212,8 +212,8 @@ module Byebug
     #
     # @return Program's output
     #
-    def run_program(cmd, input)
-      stdout, = Open3.capture2(cmd, stdin_data: input)
+    def run_program(cmd, input = '')
+      stdout, = Open3.capture2e(cmd, stdin_data: input)
 
       stdout
     end
@@ -223,6 +223,16 @@ module Byebug
     #
     def windows?
       RUBY_PLATFORM =~ /cygwin|mswin|mingw/
+    end
+
+    #
+    # Binstub command used to run byebug in standalone mode during tests
+    #
+    def binstub
+      cmd = 'bin/byebug'
+      return cmd unless windows?
+
+      "#{RbConfig.ruby} #{cmd}"
     end
   end
 end
