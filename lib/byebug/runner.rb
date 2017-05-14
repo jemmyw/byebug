@@ -105,7 +105,7 @@ module Byebug
     end
 
     def interface
-      @interface ||= LocalInterface.new
+      @interface ||= Context.interface
     end
 
     #
