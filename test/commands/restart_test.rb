@@ -1,77 +1,108 @@
 require 'test_helper'
 require 'rbconfig'
-require 'minitest/mock'
+require 'byebug/helpers/string'
 
 module Byebug
   #
   # Tests restarting functionality.
   #
   class RestartTest < TestCase
-    def test_restart_with_no_args__original_script_with_no_args__standalone
-      with_mode(:standalone) do
-        with_command_line(example_path) do
-          assert_restarts(nil, "#{ruby_bin} #{byebug_bin} #{example_path}")
+    include Helpers::StringHelper
+
+    def setup
+      super
+
+      example_file.write(program)
+      example_file.close
+    end
+
+    def program
+      deindent <<-'RUBY', leading_spaces: 8
+        #!/usr/bin/env ruby
+
+        require 'English'
+        require 'byebug'
+
+        byebug
+
+        if $ARGV.empty?
+          print "Run program #{$PROGRAM_NAME} with no args"
+        else
+          print "Run program #{$PROGRAM_NAME} with args #{$ARGV.join(',')}"
         end
-      end
+      RUBY
+    end
+
+    def test_restart_with_no_args__original_script_with_no_args__standalone
+      skip if windows?
+
+      assert_restarts(
+        "#{byebug_bin} #{example_path}",
+        'restart',
+        "Run program #{example_path} with no args"
+      )
     end
 
     def test_restart_with_no_args__original_script_with_no_args__attached
-      with_mode(:attached) do
-        with_command_line(example_path) do
-          assert_restarts(nil, "#{ruby_bin} #{example_path}")
-        end
-      end
+      skip if windows?
+
+      assert_restarts(
+        example_path,
+        'restart',
+        "Run program #{example_path} with no args"
+      )
     end
 
     def test_restart_with_no_args__original_script_through_ruby__attached
-      with_mode(:attached) do
-        with_command_line(ruby_bin, example_path) do
-          assert_restarts(nil, "#{ruby_bin} #{example_path}")
-        end
-      end
+      assert_restarts(
+        "#{ruby_bin} #{example_path}",
+        'restart',
+        "Run program #{example_path} with no args"
+      )
     end
 
     def test_restart_with_no_args__standalone
-      with_mode(:standalone) do
-        with_command_line(example_path, '1') do
-          assert_restarts(nil, "#{ruby_bin} #{byebug_bin} #{example_path} 1")
-        end
-      end
+      skip if windows?
+
+      assert_restarts(
+        "#{byebug_bin} #{example_path} 1",
+        'restart',
+        "Run program #{example_path} with args 1"
+      )
     end
 
     def test_restart_with_args__standalone
-      with_mode(:standalone) do
-        with_command_line(example_path, '1') do
-          assert_restarts('2', "#{ruby_bin} #{byebug_bin} #{example_path} 2")
-        end
-      end
+      skip if windows?
+
+      assert_restarts(
+        "#{byebug_bin} #{example_path} 1",
+        'restart 2',
+        "Run program #{example_path} with args 2"
+      )
     end
 
     def test_restart_with_no_args__attached
-      with_mode(:attached) do
-        with_command_line(example_path, '1') do
-          assert_restarts(nil, "#{ruby_bin} #{example_path} 1")
-        end
-      end
+      assert_restarts(
+        "#{example_path} 1",
+        'restart',
+        "Run program #{example_path} with args 1"
+      )
     end
 
     def test_restart_with_args__attached
-      with_mode(:attached) do
-        with_command_line(example_path, '1') do
-          assert_restarts(2, "#{ruby_bin} #{example_path} 2")
-        end
-      end
+      assert_restarts(
+        "#{example_path} 1",
+        'restart 2',
+        "Run program #{example_path} with args 2"
+      )
     end
 
     private
 
-    def assert_restarts(arg, expected_cmd_line)
-      assert_calls(Kernel, :exec, expected_cmd_line) do
-        enter ['restart', arg].compact.join(' ')
-        debug_code(minimal_program)
+    def assert_restarts(launch_command, restart_command, expected_message)
+      stdout = run_program(launch_command, restart_command)
 
-        check_output_includes "Re exec'ing:"
-      end
+      assert_match(/#{expected_message}/, stdout)
     end
 
     def ruby_bin
