@@ -118,23 +118,23 @@ module Byebug
   #   are usually very deeply nested and on OS X where tmp path is always
   #   deeply nested.
   #
-  unless /cygwin|mswin|mingw|darwin/ =~ RUBY_PLATFORM
-    class WhereWithNotDeeplyNestedPathsTest < WhereStandardTest
-      def test_where_displays_current_backtrace_w_shorpaths_if_fullpath_disabled
-        enter 'set nofullpath', 'where', 'set fullpath'
-        debug_code(program)
+  class WhereWithNotDeeplyNestedPathsTest < WhereStandardTest
+    def test_where_displays_current_backtrace_w_shorpaths_if_fullpath_disabled
+      skip if windows? || macos?
 
-        expected_output = prepare_for_regexp <<-TXT
-          --> #0  #{example_full_class}.to_int(str#String) at #{example_path}:16
-              #1  #{example_full_class}.encode(str#String) at #{example_path}:11
-              #2  #{example_full_class}.initialize(l#String) at #{example_path}:7
-              ͱ-- #3  Class.new(*args) at #{example_path}:20
-              #4  <module:Byebug> at #{example_path}:20
-              #5  <top (required)> at #{example_path}:1
-        TXT
+      enter 'set nofullpath', 'where', 'set fullpath'
+      debug_code(program)
 
-        check_output_includes(*expected_output)
-      end
+      expected_output = prepare_for_regexp <<-TXT
+        --> #0  #{example_full_class}.to_int(str#String) at #{example_path}:16
+            #1  #{example_full_class}.encode(str#String) at #{example_path}:11
+            #2  #{example_full_class}.initialize(l#String) at #{example_path}:7
+            ͱ-- #3  Class.new(*args) at #{example_path}:20
+            #4  <module:Byebug> at #{example_path}:20
+            #5  <top (required)> at #{example_path}:1
+      TXT
+
+      check_output_includes(*expected_output)
     end
   end
 

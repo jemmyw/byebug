@@ -225,6 +225,10 @@ module Byebug
       RUBY_PLATFORM =~ /cygwin|mswin|mingw/
     end
 
+    def macos?
+      RUBY_PLATFORM =~ /darwin/
+    end
+
     #
     # Binstub command used to run byebug in standalone mode during tests
     #
