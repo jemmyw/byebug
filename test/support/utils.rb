@@ -7,6 +7,8 @@ module Byebug
   # Misc tools for the test suite
   #
   module TestUtils
+    extend self
+
     include TestMatchers
     include TestTemporary
 
