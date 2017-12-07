@@ -144,7 +144,7 @@ module Byebug
             when /^PROMPT (.*)$/
               begin
                 puts "D: read command"
-                input = interface.read_command("#{conn}: #{Regexp.last_match[1]}")
+                input = interface.read_command("#{this_connection}: #{Regexp.last_match[1]}")
                 break unless input
                 if input =~ /i (\d+)$/
                   conn = Regexp.last_match[1].to_i
@@ -162,7 +162,7 @@ module Byebug
               end
               socket.puts input
             when /^CONFIRM (.*)$/
-              input = interface.readline("#{conn}: #{Regexp.last_match[1]}")
+              input = interface.readline("#{this_connection}: #{Regexp.last_match[1]}")
               break unless input
               socket.puts input
             else
