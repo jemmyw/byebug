@@ -98,42 +98,81 @@ module Byebug
     end
 
     def start_client_control(host = nil, port = PORT)
-      puts "Connecting to byebug"
+      puts 'Connecting to byebug'
       socket = TCPSocket.new(host, port)
-      puts "Connected"
+      puts 'Connected'
 
       Context.interface = RemoteInterface.new(socket)
       # ControlProcessor.new(Byebug.current_context).process_commands
     end
 
     def start_server_interface(host = nil, port = PORT)
-      puts "Starting server"
+      puts 'Starting server'
       server = TCPServer.new(host, port)
       count = 0
+      interface = LocalInterface.new
+      connections = {}
+      current_connection = nil
 
-      while socket = server.accept
-        count += 1
-        conn = count
-        puts "Accepted connection #{conn}"
-        interface = LocalInterface.new
+      count_mutex = Mutex.new
 
-        while (line = socket.gets)
-          case line
-          when /^PROMPT (.*)$/
-            input = interface.read_command("#{conn}: #{Regexp.last_match[1]}")
-            break unless input
-            socket.puts input
-          when /^CONFIRM (.*)$/
-            input = interface.readline("#{conn}: #{Regexp.last_match[1]}")
-            break unless input
-            socket.puts input
-          else
-            puts line
+      @thread = Thread.new do
+        while socket = server.accept
+          count_mutex.synchronize do
+            count += 1
+            puts "Accepted connection #{count}"
+            connections[count] = socket
+            current_connection = count if current_connection.nil?
           end
         end
+      end
 
-        puts "Disconnect"
-        socket.close
+      interface = LocalInterface.new
+
+      loop do
+        if current_connection
+          this_connection = current_connection
+          socket = connections[current_connection]
+
+          while (line = socket.gets)
+            case line
+            when /^PROMPT (.*)$/
+              begin
+                input = interface.read_command("#{conn}: #{Regexp.last_match[1]}")
+                break unless input
+                if input =~ /i (\d+)$/
+                  conn = Regexp.last_match[1].to_i
+                  if connections[conn]
+                    current_connection = Regexp.last_match[i].to_i
+                    break
+                  else
+                    puts "No connection #{conn}"
+                    throw 'no connection'
+                  end
+                end
+              rescue
+                retry
+              end
+              socket.puts input
+            when /^CONFIRM (.*)$/
+              input = interface.readline("#{conn}: #{Regexp.last_match[1]}")
+              break unless input
+              socket.puts input
+            else
+              puts line
+            end
+
+            if current_connection == this_connection
+              connections[current_connection] = nil
+              current_connection = nil
+            end
+          end
+        else
+          input = interface.read_command('connection?')
+          if input.to_i > 0 && connections[input.to_i]
+            current_connection = input.to_i
+          end
+        end
       end
     end
 
