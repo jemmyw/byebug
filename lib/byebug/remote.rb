@@ -161,11 +161,11 @@ module Byebug
             else
               puts line
             end
+          end
 
-            if current_connection == this_connection
-              connections[current_connection] = nil
-              current_connection = nil
-            end
+          if current_connection == this_connection
+            connections[current_connection] = nil
+            current_connection = nil
           end
         else
           input = interface.read_command('connection?')
