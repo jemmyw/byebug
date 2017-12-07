@@ -100,10 +100,14 @@ module Byebug
     def start_client_control(host = nil, port = PORT)
       puts 'Connecting to byebug'
       socket = TCPSocket.new(host, port)
-      puts 'Connected'
-
-      Context.interface = RemoteInterface.new(socket)
-      # ControlProcessor.new(Byebug.current_context).process_commands
+      conn_line = socket.gets
+      unless conn_line =~ /CONN (\d+)$/
+        puts "Invalid connection"
+        socket.close
+      else
+        puts "Connected #{Regexp.last_match[1]}"
+        Context.interface = RemoteInterface.new(socket)
+      end
     end
 
     def start_server_interface(host = nil, port = PORT)
@@ -120,9 +124,9 @@ module Byebug
         while socket = server.accept
           count_mutex.synchronize do
             count += 1
-            puts "Accepted connection #{count}"
             connections[count] = socket
             current_connection = count if current_connection.nil?
+            socket.puts "CONN #{count}"
           end
         end
       end
@@ -168,7 +172,7 @@ module Byebug
             current_connection = nil
           end
         else
-          input = interface.read_command('connection?')
+          input = interface.read_command('connection? ')
           if input.to_i > 0 && connections[input.to_i]
             current_connection = input.to_i
           end
