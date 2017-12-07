@@ -139,6 +139,7 @@ module Byebug
           socket = connections[current_connection]
 
           while (line = socket.gets)
+            puts line
             case line
             when /^PROMPT (.*)$/
               begin
