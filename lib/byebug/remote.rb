@@ -118,6 +118,7 @@ module Byebug
       count = 0
       interface = LocalInterface.new
       connections = {}
+      new_connections = []
       current_connection = nil
 
       count_mutex = Mutex.new
@@ -129,12 +130,14 @@ module Byebug
             connections[count] = socket
             current_connection = count if current_connection.nil?
             socket.puts "CONN #{count}"
+            new_connections << count
           end
         end
       end
 
       interface = LocalInterface.new
       running = true
+      last_showed_con = false
 
       while running
         if current_connection
@@ -142,6 +145,15 @@ module Byebug
           socket = connections[current_connection]
 
           while (line = socket.gets)
+            count_mutex.synchronize do
+              if new_connections.any?
+                new_connnections.each do |conn|
+                  puts "New connection: #{conn}"
+                end
+                new_connections.clear
+              end
+            end
+
             begin
               case line
                 when /^PROMPT (.*)$/
