@@ -103,7 +103,7 @@ module Byebug
       puts "Connected"
 
       Context.interface = RemoteInterface.new(socket)
-      ControlProcessor.new(Byebug.current_context).process.commands
+      # ControlProcessor.new(Byebug.current_context).process_commands
     end
 
     def start_server_interface(host = nil, port = PORT)
