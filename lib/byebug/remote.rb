@@ -143,6 +143,7 @@ module Byebug
             case line
             when /^PROMPT (.*)$/
               begin
+                puts "D: read command"
                 input = interface.read_command("#{conn}: #{Regexp.last_match[1]}")
                 break unless input
                 if input =~ /i (\d+)$/
@@ -155,7 +156,8 @@ module Byebug
                     throw 'no connection'
                   end
                 end
-              rescue
+              rescue => err
+                puts "err: #{err.to_s}"
                 retry
               end
               socket.puts input
