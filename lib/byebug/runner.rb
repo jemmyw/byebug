@@ -67,6 +67,11 @@ module Byebug
       Byebug.start_client(*@remote)
     end
 
+    def server=(host_and_port)
+      @server ||= Byebug.parse_host_and_port(host_and_port)
+      Byebug.start_server_interface(*@server)
+    end
+
     def init_script
       defined?(@init_script) ? @init_script : true
     end

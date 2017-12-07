@@ -17,6 +17,7 @@ module Byebug
       stop
       require_flag
       remote
+      server
       trace
       version
       help
@@ -69,6 +70,12 @@ module Byebug
     def remote
       @opts.on '-R', '--remote [host:]port', 'Remote debug [host:]port' do |p|
         @runner.remote = p
+      end
+    end
+
+    def server
+      @opts.on '-S', '--server [host:]port', 'Remote debug server [host:]port' do |s|
+        @runner.server = s
       end
     end
 

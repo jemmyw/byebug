@@ -97,6 +97,43 @@ module Byebug
       socket.close
     end
 
+    def start_client_control(host = nil, port = PORT)
+      puts "Connecting to byebug"
+      socket = TCPSocket.new(host, port)
+      puts "Connected"
+
+      Context.interface = RemoteInterface.new(socket)
+      ControlProcessor.new(Byebug.current_context).process.commands
+    end
+
+    def start_server_interface(host = nil, port = PORT)
+      puts "Starting server"
+      server = TCPServer.new(host, port)
+
+      while socket = server.accept
+        puts "Accepted connection"
+        interface = LocalInterface.new
+
+        while (line = socket.gets)
+          case line
+          when /^PROMPT (.*)$/
+            input = interface.read_command(Regexp.last_match[1])
+            break unless input
+            socket.puts input
+          when /^CONFIRM (.*)$/
+            input = interface.readline(Regexp.last_match[1])
+            break unless input
+            socket.puts input
+          else
+            puts line
+          end
+        end
+
+        puts "Disconnect"
+        socket.close
+      end
+    end
+
     def parse_host_and_port(host_port_spec)
       location = host_port_spec.split(':')
       location[1] ? [location[0], location[1].to_i] : ['localhost', location[0]]
