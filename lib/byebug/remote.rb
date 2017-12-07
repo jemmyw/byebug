@@ -109,19 +109,22 @@ module Byebug
     def start_server_interface(host = nil, port = PORT)
       puts "Starting server"
       server = TCPServer.new(host, port)
+      count = 0
 
       while socket = server.accept
-        puts "Accepted connection"
+        count += 1
+        conn = count
+        puts "Accepted connection #{conn}"
         interface = LocalInterface.new
 
         while (line = socket.gets)
           case line
           when /^PROMPT (.*)$/
-            input = interface.read_command(Regexp.last_match[1])
+            input = interface.read_command("#{conn}: #{Regexp.last_match[1]}")
             break unless input
             socket.puts input
           when /^CONFIRM (.*)$/
-            input = interface.readline(Regexp.last_match[1])
+            input = interface.readline("#{conn}: #{Regexp.last_match[1]}")
             break unless input
             socket.puts input
           else
