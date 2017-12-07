@@ -134,8 +134,9 @@ module Byebug
       end
 
       interface = LocalInterface.new
+      running = true
 
-      loop do
+      while running
         if current_connection
           this_connection = current_connection
           socket = connections[current_connection]
@@ -177,9 +178,20 @@ module Byebug
           end
         else
           input = interface.read_command('connection? ')
+          if input == "exit"
+            running = false
+            break
+          end
           if input.to_i > 0 && connections[input.to_i]
             current_connection = input.to_i
           end
+        end
+      end
+
+      count_mutex.synchronize do
+        connections.each do |conn, socket|
+          puts "Closing #{conn}"
+          socket.close rescue nil
         end
       end
     end
