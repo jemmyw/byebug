@@ -50,6 +50,7 @@ matrix:
 branches:
   only:
     - master
+    - better_runner_and_restart_tests
 
 notifications:
   - provider: Email
