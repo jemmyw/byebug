@@ -43,7 +43,6 @@ cache:
   - .bundle/gems
 
 matrix:
-  fast_finish: true
   allow_failures:
     - ruby_version: _trunk
 
