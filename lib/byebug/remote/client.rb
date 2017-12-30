@@ -16,9 +16,7 @@ module Byebug
       # Connects to the remote byebug
       #
       def start(host = 'localhost', port = PORT)
-        puts 'Connecting to byebug server...'
-        socket = TCPSocket.new(host, port)
-        puts 'Connected.'
+        socket = connect_at(host, port)
 
         while (line = socket.gets)
           case line
@@ -36,6 +34,15 @@ module Byebug
         end
 
         socket.close
+      end
+
+      private
+
+      def connect_at(host, port)
+        puts 'Connecting to byebug server...'
+        socket = TCPSocket.new(host, port)
+        puts 'Connected.'
+        socket
       end
     end
   end
