@@ -29,7 +29,7 @@ module Byebug
             break unless input
             socket.puts input
           else
-            puts line
+            interface.puts line
           end
         end
 
@@ -39,9 +39,9 @@ module Byebug
       private
 
       def connect_at(host, port)
-        puts 'Connecting to byebug server...'
+        interface.puts 'Connecting to byebug server...'
         socket = TCPSocket.new(host, port)
-        puts 'Connected.'
+        interface.puts 'Connected.'
         socket
       end
     end

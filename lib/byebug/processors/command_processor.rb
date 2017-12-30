@@ -116,7 +116,6 @@ module Byebug
 
     def after_repl
       interface.autosave
-      interface.close
     end
 
     #

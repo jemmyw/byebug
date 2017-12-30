@@ -6,8 +6,6 @@ require 'byebug/remote/client'
 #
 # Remote debugging functionality.
 #
-# @todo Refactor & add tests
-#
 module Byebug
   # Port number used for remote debugging
   PORT = 8989 unless defined?(PORT)
