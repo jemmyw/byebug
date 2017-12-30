@@ -8,6 +8,10 @@
 * Ruby 2.5.0 support (#397, @yui-knk).
 * Some love & tests to remote debugging (#82).
 
+### Fixed
+
+* Remote server crash when interrupting client (#141, #274).
+
 ## 9.1.0 - 2017-08-22
 
 ### Added
