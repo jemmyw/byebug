@@ -54,6 +54,7 @@ matrix:
 branches:
   only:
     - master
+    - chore/macos_and_ruby25
 
 notifications:
   email:
