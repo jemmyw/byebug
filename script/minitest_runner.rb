@@ -6,6 +6,7 @@ $LOAD_PATH << File.expand_path(File.join('..', 'test'), __dir__)
 require 'minitest'
 require 'English'
 require 'shellwords'
+require 'timeout'
 
 #
 # Helper class to aid running minitest
