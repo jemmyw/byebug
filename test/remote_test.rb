@@ -18,7 +18,7 @@ module Byebug
          9:    end
         10:
         11:    self.wait_connection = true
-        12:    self.start_server
+        12:    self.start_server('127.0.0.1')
         13:
         14:    byebug
         15:
@@ -70,7 +70,7 @@ module Byebug
     end
 
     def launch_client
-      Byebug::Remote::Client.new(interface).start
+      Byebug::Remote::Client.new(interface).start('127.0.0.1')
     rescue Errno::ECONNREFUSED
       sleep 0.1 && retry
     end
