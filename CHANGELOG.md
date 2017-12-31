@@ -7,6 +7,7 @@
 * Show valid breakpoint locations when invalid location given (#393, @ko1).
 * Ruby 2.5.0 support (#397, @yui-knk).
 * Some love & tests to remote debugging (#82).
+* `remote_byebug` shortcut to start the most common case for remote debugging (#141).
 
 ### Fixed
 
