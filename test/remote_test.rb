@@ -47,6 +47,16 @@ module Byebug
         '8:     end'
     end
 
+    def test_ignoring_the_main_server_and_control_threads
+      enter 'thread list', 'cont'
+
+      remote_debug(program)
+
+      check_output_includes \
+        %r{!.*/byebug/remote/server.rb},
+        %r{!.*/byebug/remote/server.rb}
+    end
+
     private
 
     def remote_debug(program)
