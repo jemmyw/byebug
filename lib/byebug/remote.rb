@@ -29,7 +29,7 @@ module Byebug
     end
 
     #
-    # Starts a remote byebug
+    # Starts the remote server main thread
     #
     def start_server(host = nil, port = PORT)
       return if @thread
@@ -57,6 +57,9 @@ module Byebug
       mutex.synchronize { proceed.wait(mutex) } if wait_connection
     end
 
+    #
+    # Starts the remote server control thread
+    #
     def start_control(host = nil, ctrl_port = PORT + 1)
       return @actual_control_port if @control_thread
       server = TCPServer.new(host, ctrl_port)
