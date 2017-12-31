@@ -28,6 +28,8 @@ module Byebug
     end
 
     def test_connecting_to_the_remote_debugger
+      skip unless Process.respond_to?(:fork)
+
       enter 'quit!'
 
       remote_debug(program)
@@ -36,6 +38,8 @@ module Byebug
     end
 
     def test_interacting_with_the_remote_debugger
+      skip unless Process.respond_to?(:fork)
+
       enter 'cont 7', 'cont'
 
       remote_debug(program)
@@ -48,6 +52,8 @@ module Byebug
     end
 
     def test_ignoring_the_main_server_and_control_threads
+      skip unless Process.respond_to?(:fork)
+
       enter 'thread list', 'cont'
 
       remote_debug(program)
